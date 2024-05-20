@@ -28,5 +28,14 @@ module.exports = {
     'react'
   ],
   rules: {
+    quotes: ['error', 'single'],
+    indent: ['error', 2],
+    eqeqeq: 'off',
+    'no-unused-vars': 'warn',
+    'no-multi-spaces': ['warn'],
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
+    'react/no-deprecated': 'off',
+    camelcase: 'off'
   }
 }
