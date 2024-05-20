@@ -1,3 +1,9 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+admin.site.register(RegistrationStatus)
+admin.site.register(TypeDocument)
+admin.site.register(Worker)
+admin.site.register(Remuneration)
+admin.site.register(Voucher)
+admin.site.register(PaymentReceiptVerification)
