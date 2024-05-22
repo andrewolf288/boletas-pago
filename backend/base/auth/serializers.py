@@ -4,10 +4,10 @@ from rest_framework import serializers
 class ContentTyeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContentType
-        fields = ['name']
+        fields = ['name', 'model']
 
 class PermissionSerializer(serializers.ModelSerializer):
-    content_type = serializers.CharField(source='content_type.name')
+    content_type = ContentTyeSerializer(read_only=True)
 
     class Meta:
         model = Permission

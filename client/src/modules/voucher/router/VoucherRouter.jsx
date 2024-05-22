@@ -1,9 +1,10 @@
 import { Route, Routes } from 'react-router-dom'
-import { ViewVoucher } from '../pages'
+import { ListVouchers, ViewVoucher } from '../pages'
 
-export const VoucherRoutes = () => {
+export const VoucherRouter = () => {
   return (
     <Routes>
+      <Route path='' element={<ListVouchers />}/>
       <Route path='view/:idVoucher' element={<ViewVoucher />}/>
     </Routes>
   )

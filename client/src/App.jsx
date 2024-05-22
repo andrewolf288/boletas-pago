@@ -3,6 +3,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AppRouter } from './router'
 import { Toaster } from 'react-hot-toast'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import './App.css'
 
 function App () {
   return (
