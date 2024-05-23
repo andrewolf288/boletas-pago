@@ -18,6 +18,13 @@ class TypeDocument(models.Model):
     def __str__(self):
         return self.description
 
+class TypeRemuneration(models.Model):
+    description = models.CharField(max_length=100, blank=False, null=False)
+    state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
+
+    def __str__(self):
+        return self.description
+
 class Worker(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     type_document = models.ForeignKey(TypeDocument, null=True, on_delete=models.SET_NULL)
@@ -32,19 +39,41 @@ class Worker(models.Model):
         return f'{self.user.first_name} {self.user.last_name} - {self.document}'
 
 class Remuneration(models.Model):
-    month = models.PositiveSmallIntegerField()
+    code = models.CharField(max_length=7, unique=True, editable=False)
     year = models.PositiveIntegerField()
-    remunerationDate = models.DateTimeField()
-    creationDate = models.DateTimeField()
-    updateDate = models.DateTimeField()
+    month = models.PositiveSmallIntegerField()
+    duration = models.PositiveSmallIntegerField()
+    remunerationType = models.ForeignKey(TypeRemuneration, null=True, on_delete=models.SET_NULL)
+    remunerationDateStart = models.DateField()
+    remunerationDateEnd = models.DateField()
+    note = models.TextField(null=True, blank=True)
+    creationDate = models.DateTimeField(auto_now_add=True)
+    updateDate = models.DateTimeField(auto_now=True)
     state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
 
     class Meta:
         verbose_name = 'Remuneración'
         verbose_name_plural = 'Remuneraciones'
     
+    def generate_code(self):
+        # Obtener el último objeto y su código
+        last_object = Remuneration.objects.all().order_by('id').last()
+        if not last_object:
+            new_code = 'PL00001'
+        else:
+            last_code = last_object.code
+            last_number = int(last_code[2:])
+            new_number = last_number + 1
+            new_code = f'PL{new_number:05d}'
+        return new_code
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = self.generate_code()
+        super().save(*args, **kwargs)
+    
     def __str__(self):
-        return f'{str(self.month).zfill(2)} - {self.year}'
+        return f'{self.code} - {str(self.month).zfill(2)} - {self.year}'
 
 class Voucher(models.Model):
     remuneration = models.ForeignKey(Remuneration, on_delete=models.CASCADE)
