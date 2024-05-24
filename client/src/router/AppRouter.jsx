@@ -5,11 +5,13 @@ import { Login } from '../auth/pages'
 import { HomePage, MainCotainerApp } from '../components'
 import { WorkerRouter } from '../modules/worker/router/WorkerRouter'
 import { VoucherRouter } from '../modules/voucher/router/VoucherRouter'
+import { VoucherControllerRouter } from '../modules/controlVoucher/router/VoucherControllerRouter'
 
 export const AppRouter = () => {
   return (
     <Routes>
       <Route path='login' element={<Login/>}/>
+      <Route path='voucherController/*' element={<VoucherControllerRouter />}/>
       <Route path='/*' element={<AppRouterModules />}/>
     </Routes>
   )

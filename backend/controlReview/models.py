@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 import uuid
 
 User = get_user_model()
+from django.utils import timezone
 
 class RegistrationStatus(models.Model):
     state = models.CharField(max_length=1, primary_key=True)
@@ -25,10 +26,37 @@ class TypeRemuneration(models.Model):
     def __str__(self):
         return self.description
 
+class TypeWorker(models.Model):
+    description = models.CharField(max_length=100, blank=False, null=False)
+    state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
+
+    def __str__(self):
+        return self.description
+
+class WorkerPosition(models.Model):
+    description = models.CharField(max_length=100, blank=False, null=False)
+    state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
+
+    def __str__(self):
+        return self.description
+
 class Worker(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    type_document = models.ForeignKey(TypeDocument, null=True, on_delete=models.SET_NULL)
+    workerPosition = models.ForeignKey(WorkerPosition, null=True, on_delete=models.SET_NULL)
+    typeDocument = models.ForeignKey(TypeDocument, null=True, on_delete=models.SET_NULL)
+    typeWorker = models.ForeignKey(TypeWorker, null=True, on_delete=models.SET_NULL)
     document = models.CharField(max_length=11, unique=True, blank=False, null=False)
+    workRegime = models.CharField(max_length=100, null=True, blank=True)
+    specialSituation = models.CharField(max_length=200, null=True, blank=True)
+    pensionScheme = models.CharField(max_length=150, null=True, blank=True)
+    codeCUSPP = models.CharField(max_length=20, null=True, blank=True)
+    salary = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    admissionDate = models.DateField(default=timezone.now)
+    terminationDate = models.DateField(default=timezone.now)
+    sede = models.CharField(max_length=100, null=True, blank=True)
+    costCenter = models.CharField(max_length=10, null=True, blank=True)
+    situation = models.CharField(max_length=50, null=True, blank=True)
+    hasChildren = models.BooleanField(default=False)
     state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
 
     class Meta:
@@ -76,11 +104,70 @@ class Remuneration(models.Model):
         return f'{self.code} - {str(self.month).zfill(2)} - {self.year}'
 
 class Voucher(models.Model):
+    # informacion de verificacion
     remuneration = models.ForeignKey(Remuneration, on_delete=models.CASCADE)
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     reviewed = models.BooleanField(default=False)
     reviewDate = models.DateTimeField()
+
+    #informacion del trabajador
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
+
+    # informacion planilla
+    fechaInicioVacaciones = models.DateField(null=True, blank=True)
+    fechaFinVacaciones = models.DateField(null=True, blank=True)
+    diasLaborados = models.PositiveSmallIntegerField(default=0)
+    diasNoLaborados = models.PositiveSmallIntegerField(default=0)
+    horasLaboradas = models.CharField(max_length=10, null=True, blank=True)
+    horasExtraSimples = models.CharField(max_length=10, null=True, blank=True)
+    horasExtrasDobles = models.CharField(max_length=10, null=True, blank=True)
+    bonificacionNocturna = models.CharField(max_length=10, null=True, blank=True)
+    diasFalta = models.PositiveSmallIntegerField(default=0)
+    diasVacaciones = models.PositiveSmallIntegerField(default=0)
+    diasDescansoMedico = models.PositiveSmallIntegerField(default=0)
+
+    # remuneraciones
+    haberBasico = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    asignacionFamiliar = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    licenciaGoceHaber = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    incapacidadEnfermedad = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    hrsExtSimples25 = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    hrsExtSimples35 = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    diaDelTrabajador = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    comisionDestajo = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    gratificacion = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    bonoExtraordinario = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    cts = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    vacaciones = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    utilidad = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    canastaVale = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    premio =  models.DecimalField(max_digits=8, decimal_places=2, default=0)
+
+    # descuentos
+    snp = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    afpFondo = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    afpSeguro = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    afpComision = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    rtaStaCategoria = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    adelantos = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    esSaludVida = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    tardanzaPermisosDescuentos = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    inasistencia = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    pagoGratificaciones = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    pagoCTS = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    pagoVacacionesBeneficios = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    otrosDescuentos = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    pagoUtilidad = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    entCanastaVale = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    # aportes del empleador
+    esEssalud = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    senati = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    sctrSaludPension = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    # datos finales
+    totalRemuneraciones = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    totalDescuentos = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    totalAportaciones = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    # datos de registro
     creationDate = models.DateTimeField(auto_created=True)
     updateDate = models.DateTimeField(auto_now_add=True)
     state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
