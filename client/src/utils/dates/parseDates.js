@@ -36,3 +36,23 @@ export function parseFromISOToDate (isoDate) {
   const formattedDate = `${day}/${month}/${year}`
   return formattedDate
 }
+
+function getDayName (date) {
+  const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
+  return days[date.getDay()]
+}
+
+function getMonthNameByDate (date) {
+  const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+  return months[date.getMonth()]
+}
+
+export function parseDateVoucher (dateString) {
+  const date = new Date(dateString)
+  const dayName = getDayName(date)
+  const day = date.getDate()
+  const monthName = getMonthNameByDate(date)
+  const year = date.getFullYear()
+
+  return `${dayName}, ${day} de ${monthName} de ${year}`
+}

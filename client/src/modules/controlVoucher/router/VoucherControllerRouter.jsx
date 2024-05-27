@@ -5,7 +5,7 @@ import { ViewControllerVoucher } from '../pages/ViewControllerVoucher'
 export const VoucherControllerRouter = () => {
   return (
     <Routes>
-      <Route path='view/:tokenUUID' element={<ViewControllerVoucher />}/>
+      <Route path='view' element={<ViewControllerVoucher />}/>
     </Routes>
   )
 }

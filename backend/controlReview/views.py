@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User, Group
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, viewsets, status
+from rest_framework.decorators import action
 from .models import *
 from .serializers import *
 from openpyxl import load_workbook
@@ -13,6 +14,24 @@ class RemunerationView(generics.ListAPIView):
     serializer_class = RemunerationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+class VoucherViewSet(viewsets.ViewSet):
+    
+    @action(detail=False, methods=['get'])
+    def getVoucherByToken(self, request):
+        token = request.query_params.get('token', None)
+        print(token)
+        if token is not None:
+            try:
+                record = Voucher.objects.get(token=token)
+                serializer = VoucherSerializer(record)
+                return Response(serializer.data)
+            except Voucher.DoesNotExist:
+                return Response({'detail': 'Record not found.'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'detail': 'Token parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Funcion de importación de trabajadores
 def cargar_datos_desde_excel(request):
     grupo_trabajador, created = Group.objects.get_or_create(name='Trabajador')
 
