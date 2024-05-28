@@ -6,29 +6,99 @@ from .models import *
 from .serializers import *
 from openpyxl import load_workbook
 from rest_framework.response import Response
+from django_user_agents.utils import get_user_agent
+from django.utils import timezone
 import os
 
-# Create your views here.
-class RemunerationView(generics.ListAPIView):
+class RemunerationViewSet(viewsets.ModelViewSet):
     queryset = Remuneration.objects.all()
-    serializer_class = RemunerationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return RemunerationDetailSerializer
+        return RemunerationSerializer
+
+    def list(self, request):
+        serializer = self.get_serializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 class VoucherViewSet(viewsets.ViewSet):
     
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['post'])
     def getVoucherByToken(self, request):
-        token = request.query_params.get('token', None)
-        print(token)
-        if token is not None:
+        token = request.data.get('token', None)
+        document = request.data.get('document', None)
+
+        if token is not None and document is not None:
             try:
                 record = Voucher.objects.get(token=token)
-                serializer = VoucherSerializer(record)
-                return Response(serializer.data)
+                if record.worker.document == document:
+                    if record.reviewed == True:
+                        return Response({'detail': 'Recurso no disponible', 'data': record.reviewDate}, status=status.HTTP_410_GONE)
+                    else:
+                        serializer = VoucherSerializer(record)
+                        return Response(serializer.data)
+                else:
+                    return Response({'detail': 'Las credenciales no corresponden'}, status=status.HTTP_401_UNAUTHORIZED)
+
             except Voucher.DoesNotExist:
                 return Response({'detail': 'Record not found.'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'detail': 'Token parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def verifyVoucherByToken(self, request):
+        downloadPDF = request.data.get('downloadPDF', None)
+        datetimeStartSession = request.data.get('datetimeStartSession', None)
+        datetimeEndSession = request.data.get('datetimeEndSession', None)
+        idVoucher = request.data.get('idVoucher', None)
+        latitude = request.data.get('latitude', None)
+        longitude = request.data.get('longitude', None)
+
+        if idVoucher is not None:
+            try:
+                record = Voucher.objects.get(id=idVoucher)
+                # Obtener información del dispositivo
+                user_agent = get_user_agent(request)
+                deviceType = 'PC' if user_agent.is_pc else 'Mobile' if user_agent.is_mobile else 'Tablet' if user_agent.is_tablet else 'Bot' if user_agent.is_bot else 'Unknown'
+
+                # Obtener la dirección IP del cliente
+                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+                if x_forwarded_for:
+                    ip = x_forwarded_for.split(',')[0]
+                else:
+                    ip = request.META.get('REMOTE_ADDR')
+                
+                # Crear una nueva instancia de PaymentReceiptVerification
+                verification = PaymentReceiptVerification(
+                    voucher=record,
+                    latitude=latitude,
+                    longitude=longitude,
+                    deviceType=deviceType,  # Puedes añadir lógica para obtener esto si es necesario
+                    datetimeStartSession=datetimeStartSession,
+                    datetimeEndSession=datetimeEndSession,
+                    downloadPDF=downloadPDF,
+                    ipAddress=ip,
+                )
+                verification.save()
+
+                # Actualizar la instancia de Voucher
+                record.reviewed = True
+                record.reviewedDate = timezone.now()
+                record.save()
+
+                return Response({'detail': 'Verification completed successfully.'}, status=status.HTTP_200_OK)
+
+            except Voucher.DoesNotExist:
+                return Response({'detail': 'Record not found.'}, status=status.HTTP_404_NOT_FOUND)   
+        else:
+            return Response({'detail': 'Parameters incorrects'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Funcion de importación de trabajadores

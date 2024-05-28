@@ -1,10 +1,15 @@
 import { Font, StyleSheet } from '@react-pdf/renderer'
 
 const fontSizeBase = 7
-export const FontCalibri = () => Font.register({
-  family: 'Calibri',
+const robotoRegularUrl = 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf'
+const robotoBoldUrl = 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf'
+const fontFamily = 'Roboto'
+
+export const FontRegister = () => Font.register({
+  family: 'Roboto',
   fonts: [
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf' }
+    { src: robotoRegularUrl }, // fuente normal
+    { src: robotoBoldUrl, fontWeight: 'bold' } // fuente en negrita
   ]
 })
 
@@ -45,49 +50,49 @@ export const VoucherStyles = StyleSheet.create({
     marginVertical: 10
   },
   textHeaderVoucher: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase + 3,
     fontWeight: 'bold'
   },
   textTitleSectionData: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontWeight: 'bold',
     fontSize: fontSizeBase
   },
   textSubTitleHeader: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase
   },
   textTitleProperty: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase,
     fontWeight: 'bold',
     width: '38%'
   },
   textValueProperty: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase,
     width: '62%'
   },
   textTitleObservation: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase,
     fontWeight: 'bold',
     width: '20%'
   },
   textValueObservation: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase - 1,
     width: '80%'
   },
   textTitlePropertyGrid: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase,
     fontWeight: 'bold',
     width: '70%'
   },
   textValuePropertyGrid: {
-    fontFamily: 'Calibri',
+    fontFamily,
     fontSize: fontSizeBase,
     fontWeight: 'bold',
     width: '30%',

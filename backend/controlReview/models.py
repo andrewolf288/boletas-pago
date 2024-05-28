@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
+from django.utils import timezone
+from datetime import datetime
 
 User = get_user_model()
-from django.utils import timezone
 
 class RegistrationStatus(models.Model):
     state = models.CharField(max_length=1, primary_key=True)
@@ -105,10 +106,13 @@ class Remuneration(models.Model):
 
 class Voucher(models.Model):
     # informacion de verificacion
-    remuneration = models.ForeignKey(Remuneration, on_delete=models.CASCADE)
+    remuneration = models.ForeignKey(Remuneration, related_name='vouchers', on_delete=models.CASCADE)
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     reviewed = models.BooleanField(default=False)
-    reviewDate = models.DateTimeField()
+    reviewDate = models.DateTimeField(blank=True, null=True)
+    sentEmail = models.BooleanField(default=False)
+    errorSend = models.TextField(blank=True)
+    sentEmailDate = models.DateTimeField(blank=True, null=True)
 
     #informacion del trabajador
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
@@ -181,12 +185,26 @@ class Voucher(models.Model):
         return f'{str(self.token)}'
 
 class PaymentReceiptVerification(models.Model):
-    voucher = models.ForeignKey(Voucher, on_delete=models.CASCADE)
-    latitude = models.FloatField(null=True)
-    longitude = models.FloatField(null=True)
+    voucher = models.OneToOneField(Voucher, related_name='verification', on_delete=models.CASCADE)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     deviceType = models.CharField(max_length=50, blank=True)
     datetimeStartSession = models.DateTimeField(null=True, blank=True)
     datetimeEndSession = models.DateTimeField(null=True, blank=True)
     durationReview = models.IntegerField(default=0)
     downloadPDF = models.BooleanField(default=False)
+    ipAddress = models.GenericIPAddressField(null=True, blank=True)
     state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
+
+    def save(self, *args, **kwargs):
+        # Convertir datetimeStartSession y datetimeEndSession a objetos datetime si son cadenas
+        if isinstance(self.datetimeStartSession, str):
+            self.datetimeStartSession = datetime.fromisoformat(self.datetimeStartSession)
+        if isinstance(self.datetimeEndSession, str):
+            self.datetimeEndSession = datetime.fromisoformat(self.datetimeEndSession)
+        
+        # Calcular la duración de la revisión
+        if self.datetimeStartSession and self.datetimeEndSession:
+            self.durationReview = int((self.datetimeEndSession - self.datetimeStartSession).total_seconds())
+        
+        super().save(*args, **kwargs)

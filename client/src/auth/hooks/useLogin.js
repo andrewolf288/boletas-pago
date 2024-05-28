@@ -3,11 +3,17 @@ import { login } from '../../services'
 import { useAuthStore } from '../../stores'
 import { useNavigate } from 'react-router-dom'
 import { alertError } from '../../utils/alerts'
+import { useState } from 'react'
 
 export function useLogin () {
   const navigate = useNavigate()
   const { register, handleSubmit } = useForm()
+  const [showPassword, setShowPassword] = useState(false)
   const setCredentialsLogin = useAuthStore(state => state.setCredentialsLogin)
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev)
+  }
 
   const loginUser = async (credentials) => {
     try {
@@ -22,6 +28,8 @@ export function useLogin () {
   return {
     register,
     handleSubmit,
-    loginUser
+    loginUser,
+    showPassword,
+    togglePasswordVisibility
   }
 }
