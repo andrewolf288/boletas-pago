@@ -126,6 +126,7 @@ class Voucher(models.Model):
     horasExtraSimples = models.CharField(max_length=10, blank=True)
     horasExtrasDobles = models.CharField(max_length=10, blank=True)
     bonificacionNocturna = models.CharField(max_length=10, blank=True)
+    diasLicenciaGoceHaber = models.CharField(max_length=10, blank=True)
     diasFalta = models.PositiveSmallIntegerField(default=0)
     diasVacaciones = models.PositiveSmallIntegerField(default=0)
     diasDescansoMedico = models.PositiveSmallIntegerField(default=0)
@@ -163,15 +164,18 @@ class Voucher(models.Model):
     otrosDescuentos = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     pagoUtilidad = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     entCanastaVale = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    
     # aportes del empleador
     esEssalud = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     senati = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     sctrSaludPension = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    
     # datos finales
     totalRemuneraciones = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     totalDescuentos = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     totalAportaciones = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     netoPagar = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    
     # datos de registro
     creationDate = models.DateTimeField(auto_created=True)
     updateDate = models.DateTimeField(auto_now_add=True)

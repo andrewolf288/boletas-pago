@@ -168,7 +168,7 @@ export const VoucherPDF = ({ data }) => {
               {/* LIC CON GOCE HAB. */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>LIC CON GOCE HAB.</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(data.licenciaGoceHaber)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(data.diasLicenciaGoceHaber)}</Text>
               </View>
               {/* DÍAS FALTAS  */}
               <View style={styles.containerFlexRow}>

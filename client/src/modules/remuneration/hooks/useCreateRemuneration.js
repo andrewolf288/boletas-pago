@@ -2,6 +2,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useDropzone } from 'react-dropzone'
 import { alertWarning } from '../../../utils'
+import { createRemunerationWithImportation } from '../services'
 
 export function useCreateRemuneration () {
   // estados para controlar la apertura del dialogo
@@ -19,11 +20,22 @@ export function useCreateRemuneration () {
   // estados para controlar la información del formulario
   const { register, formState: { errors }, handleSubmit, control, reset } = useForm()
   // funcion para crear remuneracion
-  const crearRemuneracion = (data) => {
+  const crearRemuneracion = async (formData) => {
     if (acceptedFiles.length === 0) {
       alertWarning('Debes ingresar la data a importar')
     } else {
-      console.log(data)
+      console.log(formData, acceptedFiles)
+      const data = new FormData()
+      data.append('file', acceptedFiles[0])
+      for (const key in formData) {
+        data.append(key, formData[key])
+      }
+
+      try {
+        const resultPeticion = await createRemunerationWithImportation(data)
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 
