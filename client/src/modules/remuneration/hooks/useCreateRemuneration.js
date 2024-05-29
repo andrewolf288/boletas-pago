@@ -24,12 +24,18 @@ export function useCreateRemuneration () {
     if (acceptedFiles.length === 0) {
       alertWarning('Debes ingresar la data a importar')
     } else {
-      console.log(formData, acceptedFiles)
+      const formatFormData = {
+        ...formData,
+        remunerationDateStart: formData.remunerationDateStart.format('YYYY-MM-DD'),
+        remunerationDateEnd: formData.remunerationDateEnd.format('YYYY-MM-DD')
+      }
       const data = new FormData()
       data.append('file', acceptedFiles[0])
-      for (const key in formData) {
-        data.append(key, formData[key])
+      for (const key in formatFormData) {
+        data.append(key, formatFormData[key])
       }
+
+      console.log(data)
 
       try {
         const resultPeticion = await createRemunerationWithImportation(data)

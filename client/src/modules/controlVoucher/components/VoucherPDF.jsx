@@ -16,6 +16,7 @@ const textInformacionEnterprise = 'URB. PARQUE INDUSTRIAL RIO SECO MZ. E LT.8, C
 const textObservaciones = 'EN VIRTUD AL D. LEG N° 1310 DE FECHA 29.12.2016, QUE APRUEBA EL USO DE TECNOLOGIAS DE DIGITALIZACION DE DOCUMENTOS LABORALES, PARA SUSTITUIR DOCUMENTOS FISICOS Y FIRMAS OLOGRAFICAS, SE ENVIO LA PRESENTE DEL PLAZO, AL E-MAIL DECLARADO POR EL TRABAJADOR'
 
 export const VoucherPDF = ({ data }) => {
+  console.log(data)
   const { remuneration, worker } = data
   const title = `BOLETA DE PAGO MENSUAL - ${getMonthName(remuneration.month)}-${remuneration.year} - ${data.worker.user.last_name} ${data.worker.user.first_name}`
   return (

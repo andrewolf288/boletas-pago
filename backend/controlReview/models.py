@@ -70,9 +70,9 @@ class Worker(models.Model):
 class Remuneration(models.Model):
     code = models.CharField(max_length=7, unique=True, editable=False)
     year = models.PositiveIntegerField()
-    month = models.PositiveSmallIntegerField()
-    duration = models.PositiveSmallIntegerField()
-    remunerationType = models.ForeignKey(TypeRemuneration, null=True, on_delete=models.SET_NULL)
+    month = models.PositiveIntegerField()
+    duration = models.PositiveIntegerField()
+    remunerationType = models.ForeignKey(TypeRemuneration, null=True, default=1, on_delete=models.SET_NULL)
     remunerationDateStart = models.DateField()
     remunerationDateEnd = models.DateField()
     note = models.TextField(blank=True)
@@ -177,8 +177,8 @@ class Voucher(models.Model):
     netoPagar = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     
     # datos de registro
-    creationDate = models.DateTimeField(auto_created=True)
-    updateDate = models.DateTimeField(auto_now_add=True)
+    creationDate = models.DateTimeField(auto_now_add=True)
+    updateDate = models.DateTimeField(auto_now=True)
     state = models.ForeignKey(RegistrationStatus, on_delete=models.SET_NULL, default='A', null=True)
 
     class Meta:

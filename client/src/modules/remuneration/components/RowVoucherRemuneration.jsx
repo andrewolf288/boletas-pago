@@ -11,8 +11,20 @@ export const RowVoucherRemuneration = ({ voucher }) => {
   return (
     <StyledTableRow>
       <TableCell align='left'>{`${worker.user.last_name} ${worker.user.first_name}`}</TableCell>
-      <TableCell align='center'>{voucher.sentEmail ? 'Si' : 'No' }</TableCell>
-      <TableCell align='center'>{voucher.reviewed ? 'Si' : 'No' }</TableCell>
+      <TableCell align='center'>
+        <span
+          className={`inline-block ${voucher.sentEmail ? 'bg-green-700' : 'bg-red-500'} text-white text-xs px-2 py-1 rounded-full uppercase font-semibold tracking-wide`}
+        >
+          {voucher.sentEmail ? 'Si' : 'No' }
+        </span>
+      </TableCell>
+      <TableCell align='center'>
+        <span
+          className={`inline-block ${voucher.reviewed ? 'bg-green-700' : 'bg-red-500'} text-white text-xs px-2 py-1 rounded-full uppercase font-semibold tracking-wide`}
+        >
+          {voucher.reviewed ? 'Si' : 'No' }
+        </span>
+      </TableCell>
       <TableCell align='center'>{voucher.reviewed ? parseFromISOToDate(voucher.reviewDate) : 'No verificado' }</TableCell>
       <TableCell align='center'>{voucher.reviewed ? voucher.verification.durationReview : 'No verificado' }</TableCell>
       <TableCell align='center'>{voucher.reviewed ? (voucher.verification.downloadPDF ? 'Si' : 'No') : 'No verificado' }</TableCell>

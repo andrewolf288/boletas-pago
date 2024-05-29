@@ -22,8 +22,8 @@ def send_email(subject, text_content, html_content, from_email, to_email):
 
 def obtener_nombre_mes(numero_mes):
     # Lista de nombres de meses
-    meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-             "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+    meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
+             "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"]
     # Validar que el número del mes sea válido
     if 1 <= numero_mes <= 12:
         return meses[numero_mes - 1]
