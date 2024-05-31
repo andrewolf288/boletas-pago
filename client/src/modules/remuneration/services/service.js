@@ -18,3 +18,8 @@ export const createRemunerationWithImportation = (data) => {
     }
   })
 }
+
+export const forwardEmailVoucher = (idVoucher) => {
+  const URL = 'control/voucher/forwardEmailVoucher/'
+  return client.post(URL, { idVoucher })
+}

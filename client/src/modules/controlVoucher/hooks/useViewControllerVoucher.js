@@ -3,6 +3,7 @@ import queryString from 'query-string'
 import { alertError, alertSuccess, alertWarning } from '../../../utils'
 import axios from 'axios'
 import { useGeolocation } from './useGeolocation'
+import { useLoginAttempts } from '../../../auth/hooks'
 
 export function useViewControllerVoucher () {
   const parsed = queryString.parse(location.search)
@@ -12,6 +13,7 @@ export function useViewControllerVoucher () {
   const [flagVerification, setFlagVerification] = useState(false)
   const [documentPassword, setDocumentPassword] = useState('')
   const { locationGPS, getLocation } = useGeolocation()
+  const { attempts, incrementAttempts, cooldown, isDisabled, resetAttempts, permanentlyDisabled } = useLoginAttempts()
 
   // datos del campo de autenticacion
   const onChangeDocumentPassword = ({ target }) => {
@@ -34,6 +36,7 @@ export function useViewControllerVoucher () {
       try {
         const resultRequest = await axios.post(URL, formatData)
         setVoucher(resultRequest.data)
+        resetAttempts()
         setFlagVerification(true)
 
         const now = new Date()
@@ -47,6 +50,7 @@ export function useViewControllerVoucher () {
         const { response } = error
         if (response.status === 401) {
           alertWarning('Credenciales incorrectas')
+          incrementAttempts()
         } else if (response.status === 410) {
           alertWarning('El recurso ya no esta disponible. La boleta ya fué verificada')
           setFlagVerification(true)
@@ -111,6 +115,10 @@ export function useViewControllerVoucher () {
     documentPassword,
     onChangeDocumentPassword,
     onChangeFlagDownloadPDF,
-    registerInformationValidation
+    registerInformationValidation,
+    attempts,
+    cooldown,
+    isDisabled,
+    permanentlyDisabled
   }
 }

@@ -5,7 +5,7 @@ import { IoMdClose, IoMdAddCircle } from 'react-icons/io'
 import { CustomDatePicker } from '../../../components'
 import { Controller } from 'react-hook-form'
 
-export const CreateRemuneration = () => {
+export const CreateRemuneration = ({ traerInformacionRemuneraciones }) => {
   const {
     open,
     handleClickOpen,
@@ -18,7 +18,7 @@ export const CreateRemuneration = () => {
     acceptedFiles,
     getInputProps,
     getRootProps
-  } = useCreateRemuneration()
+  } = useCreateRemuneration(traerInformacionRemuneraciones)
 
   return (
     <React.Fragment>
@@ -126,6 +126,7 @@ export const CreateRemuneration = () => {
                       name='remunerationDateStart'
                       control={control}
                       defaultValue={null}
+                      rules={{ required: 'Este campo es requerido' }}
                       render={({ field }) => (
                         <CustomDatePicker
                           value={field.value}
@@ -133,6 +134,9 @@ export const CreateRemuneration = () => {
                         />
                       )}
                     />
+                    {errors.remunerationDateStart && (
+                      <p className='text-xs text-red-500 pt-1'>Este campo es requerido</p>
+                    )}
                   </div>
                   <div className='flex flex-col'>
                     <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -142,6 +146,7 @@ export const CreateRemuneration = () => {
                       name='remunerationDateEnd'
                       control={control}
                       defaultValue={null}
+                      rules={{ required: 'Este campo es requerido' }}
                       render={({ field }) => (
                         <CustomDatePicker
                           value={field.value}
@@ -149,6 +154,9 @@ export const CreateRemuneration = () => {
                         />
                       )}
                     />
+                    {errors.remunerationDateEnd && (
+                      <p className='text-xs text-red-500 pt-1'>Este campo es requerido</p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,10 +1,10 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useDropzone } from 'react-dropzone'
-import { alertWarning } from '../../../utils'
+import { alertError, alertSuccess, alertWarning } from '../../../utils'
 import { createRemunerationWithImportation } from '../services'
 
-export function useCreateRemuneration () {
+export function useCreateRemuneration (traerInformacionRemuneraciones) {
   // estados para controlar la apertura del dialogo
   const [open, setOpen] = React.useState(false)
   // funcion para abrir el cuadro de dialogo
@@ -35,12 +35,17 @@ export function useCreateRemuneration () {
         data.append(key, formatFormData[key])
       }
 
-      console.log(data)
-
       try {
-        const resultPeticion = await createRemunerationWithImportation(data)
+        const { data: dataResult } = await createRemunerationWithImportation(data)
+        // alerta de exito
+        alertSuccess(dataResult.detail)
+        // cerrar dialogo
+        handleClose()
+        // recargar la lista de remuneraciones
+        traerInformacionRemuneraciones()
       } catch (error) {
         console.log(error)
+        alertError(error.response.data.detail)
       }
     }
   }

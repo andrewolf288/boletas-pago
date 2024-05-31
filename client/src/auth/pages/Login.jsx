@@ -9,7 +9,11 @@ export const Login = () => {
     handleSubmit,
     loginUser,
     showPassword,
-    togglePasswordVisibility
+    togglePasswordVisibility,
+    attempts,
+    cooldown,
+    isDisabled,
+    permanentlyDisabled
   } = useLogin()
   return (
     <>
@@ -31,6 +35,7 @@ export const Login = () => {
                 type="text"
                 name="username"
                 className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+                disabled={isDisabled}
               />
             </label>
 
@@ -44,6 +49,7 @@ export const Login = () => {
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 pr-10"
+                  disabled={isDisabled}
                 />
                 <button
                   type="button"
@@ -58,9 +64,15 @@ export const Login = () => {
             <button
               type="submit"
               className="bg-green-800 hover:bg-green-600 text-white py-2 rounded"
+              disabled={isDisabled}
             >
-              Iniciar Sesión
+              {permanentlyDisabled
+                ? 'Excedió el número de intentos'
+                : isDisabled
+                  ? `Deshabilitado por ${cooldown} segundos`
+                  : 'Iniciar sesión'}
             </button>
+            {attempts > 0 && <p className='text-white flex justify-center'>Intentos: {attempts}</p>}
           </form>
         </div>
 

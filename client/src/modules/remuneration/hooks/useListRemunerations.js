@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import { listRemunerations } from '../services'
-import { alertError } from '../../../utils'
 
 export function useListRemunerations () {
   const [remunerations, setRemunerations] = useState([])
+  const [loading, setLoading] = useState(false)
   const traerInformacionRemuneraciones = async () => {
     try {
+      setLoading(true)
       const { data } = await listRemunerations()
       setRemunerations(data)
     } catch (error) {
       console.log(error)
-      alertError()
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -19,6 +21,8 @@ export function useListRemunerations () {
   }, [])
 
   return {
-    remunerations
+    remunerations,
+    loading,
+    traerInformacionRemuneraciones
   }
 }

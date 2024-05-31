@@ -4,17 +4,25 @@ import { Paper, Table, TableBody, TableContainer, TableHead, TableRow } from '@m
 import { RowListRemunerations } from '../components'
 import { StyledTableCell } from '../../../styles/TableStyles'
 import { CreateRemuneration } from './CreateRemuneration'
+import { CustomCircularProgress } from '../../../components'
 
 export const ListRemunerations = () => {
   const {
-    remunerations
+    remunerations,
+    loading,
+    traerInformacionRemuneraciones
   } = useListRemunerations()
+
+  if (loading) {
+    return <CustomCircularProgress />
+  }
+
   return (
     <>
       <div className='container mx-auto'>
         <h1 className='text-center font-semibold text-2xl'>REMUNERACIONES</h1>
         <div className='flex flex-row'>
-          <CreateRemuneration />
+          <CreateRemuneration traerInformacionRemuneraciones={traerInformacionRemuneraciones}/>
         </div>
 
         <div className='mt-4'>

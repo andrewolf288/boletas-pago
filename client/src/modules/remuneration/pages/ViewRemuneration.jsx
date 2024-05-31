@@ -9,13 +9,14 @@ import { getMonthName } from '../../../utils'
 export const ViewRemuneration = () => {
   const {
     flagLoading,
-    remunerationView
+    remuneration,
+    onForwardEmailVoucher
   } = useViewRemuneration()
 
   if (flagLoading) {
     return <CustomCircularProgress />
   } else {
-    if (remunerationView) {
+    if (remuneration) {
       return (
         <div className='container mx-auto'>
           <h1 className='text-center font-semibold text-2xl'>DETALLE REMUNERACIÓN</h1>
@@ -30,7 +31,7 @@ export const ViewRemuneration = () => {
                     <input
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       type="number"
-                      value={remunerationView.year}
+                      value={remuneration.year}
                       disabled
                     />
                   </div>
@@ -41,7 +42,7 @@ export const ViewRemuneration = () => {
                     <input
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       type="text"
-                      value={getMonthName(remunerationView.month)}
+                      value={getMonthName(remuneration.month)}
                       disabled
                     />
                   </div>
@@ -51,7 +52,7 @@ export const ViewRemuneration = () => {
                     </label>
                     <input
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="number"
-                      value={remunerationView.duration}
+                      value={remuneration.duration}
                       disabled
                     />
                   </div>
@@ -66,7 +67,7 @@ export const ViewRemuneration = () => {
                     <input
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       type="text"
-                      value={remunerationView.remunerationDateStart}
+                      value={remuneration.remunerationDateStart}
                       disabled
                     />
                   </div>
@@ -77,7 +78,7 @@ export const ViewRemuneration = () => {
                     <input
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       type="text"
-                      value={remunerationView.remunerationDateEnd}
+                      value={remuneration.remunerationDateEnd}
                       disabled
                     />
                   </div>
@@ -91,7 +92,7 @@ export const ViewRemuneration = () => {
                 </label>
                 <TextField
                   type='text'
-                  value={remunerationView.note}
+                  value={remuneration.note}
                   disabled
                   multiline
                   maxLength={200}
@@ -111,18 +112,25 @@ export const ViewRemuneration = () => {
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                   <TableRow>
+                    <StyledTableCell align='center'>#</StyledTableCell>
                     <StyledTableCell align='left'>Trabajador</StyledTableCell>
                     <StyledTableCell align='center'>Enviado email</StyledTableCell>
                     <StyledTableCell align='center'>Verificado</StyledTableCell>
                     <StyledTableCell align='center'>Fecha verificado</StyledTableCell>
                     <StyledTableCell align='center'>Duración verificación</StyledTableCell>
                     <StyledTableCell align='center'>Descargó PDF</StyledTableCell>
+                    <StyledTableCell align='center'>Dispositivo</StyledTableCell>
                     <StyledTableCell align='center'>Acciones</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {remunerationView.vouchers.map((voucher) => (
-                    <RowVoucherRemuneration key={voucher.id} voucher={voucher}/>
+                  {remuneration.vouchers.map((voucher, index) => (
+                    <RowVoucherRemuneration
+                      key={voucher.id}
+                      index={index}
+                      voucher={{ ...voucher, remuneration }}
+                      forwardEmailVoucher={onForwardEmailVoucher}
+                    />
                   ))}
                 </TableBody>
               </Table>

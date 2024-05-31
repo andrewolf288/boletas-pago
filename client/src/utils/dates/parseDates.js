@@ -1,8 +1,8 @@
 export function getMonthName (monthNumber) {
   const months = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo',
-    'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre',
-    'Noviembre', 'Diciembre'
+    'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO',
+    'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE',
+    'NOVIEMBRE', 'DICIEMBRE'
   ]
 
   if (monthNumber < 1 || monthNumber > 12) {
@@ -34,6 +34,20 @@ export function parseFromISOToDate (isoDate) {
   const year = date.getUTCFullYear()
 
   const formattedDate = `${day}/${month}/${year}`
+  return formattedDate
+}
+export function parseFromISOToDateTime (isoDate) {
+  const date = new Date(isoDate)
+
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Los meses son indexados desde 0
+  const year = date.getFullYear()
+
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+
+  const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
   return formattedDate
 }
 

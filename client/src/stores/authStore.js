@@ -14,7 +14,7 @@ export const useAuthStore = create(
         set({ accessToken: tokens.access, refreshToken: tokens.refresh, user })
       },
       setCredentialsLogout: () => {
-        set({ accessToken: null, refreshToken: null })
+        set({ accessToken: null, refreshToken: null, user: null })
       },
       setCredentialRefreshedToken: (access_token) => {
         set({ accessToken: access_token })

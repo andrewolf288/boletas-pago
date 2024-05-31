@@ -191,3 +191,6 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'sistemas@emaransac.com'
 EMAIL_HOST_PASSWORD = 'a93W*d4l0'
 DEFAULT_FROM_EMAIL = 'sistemas@emaransac.com'
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'

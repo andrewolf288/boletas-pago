@@ -29,7 +29,7 @@ export const MainCotainerApp = ({ children }) => {
 
   const logoutUser = () => {
     setCredentialsLogout()
-    navigate('/login')
+    navigate('/')
   }
 
   return (

@@ -7,17 +7,20 @@ from .serializers import *
 from openpyxl import load_workbook
 from rest_framework.response import Response
 from django_user_agents.utils import get_user_agent
-from django.utils import timezone
+# from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.core.mail import get_connection
-from .utils import send_email, concatenar_mes_ano
+from .utils import concatenar_mes_ano, convert_decimal_to_hours_minutes, excel_serial_to_date, send_email_task
 import pandas as pd
 from django.db import transaction
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.utils import timezone
 
 import os
 
+DOMAIN = 'http://localhost:5173'
+EMAIL_TRANSMITTER = 'sistemas@emaransac.com'
 class RemunerationViewSet(viewsets.ModelViewSet):
     queryset = Remuneration.objects.all()
     permission_classes = [permissions.IsAuthenticated]
@@ -43,10 +46,10 @@ class RemunerationViewSet(viewsets.ModelViewSet):
 
         # si no se proporciono un archivo importado
         if not file:
-            return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            df = pd.read_excel(file)
+            df = pd.read_excel(file, dtype=str)
             # primero debemos guardar la informacion de remuneración
             remuneration = Remuneration(
                 year=data.get('year'),
@@ -57,6 +60,7 @@ class RemunerationViewSet(viewsets.ModelViewSet):
                 note=data.get('note')
             )
             remuneration.save()
+            delay = 0
 
             for index, row in df.iterrows():
                 # extraemos el valor de la primera columna (dcoument)
@@ -65,7 +69,7 @@ class RemunerationViewSet(viewsets.ModelViewSet):
                 # Verificar si el campo está vacío
                 if pd.isna(extracted_data):
                     transaction.set_rollback(True)
-                    return Response({"error": f'Se encontró valor vacio en la primera columna de la fila {index+1}'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"detail": f'Se encontró valor vacio en la primera columna de la fila {index+1}'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Convertir a cadena y quitar espacios en blanco
                 extracted_data = str(extracted_data).strip()
@@ -73,15 +77,15 @@ class RemunerationViewSet(viewsets.ModelViewSet):
                 worker = Worker.objects.get(document=extracted_data)
                 # informacion planilla
                 voucher_data = {
-                    'fechaInicioVacaciones': row.iloc[1] if not pd.isna(row.iloc[1]) else None,
-                    'fechaFinVacaciones': row.iloc[2] if not pd.isna(row.iloc[2]) else None,
+                    'fechaInicioVacaciones': excel_serial_to_date(row.iloc[1]) if not pd.isna(row.iloc[1]) else '',
+                    'fechaFinVacaciones': excel_serial_to_date(row.iloc[2]) if not pd.isna(row.iloc[2]) else '',
                     'diasLaborados': row.iloc[3] if not pd.isna(row.iloc[3]) else 0,
                     'diasNoLaborados': row.iloc[4] if not pd.isna(row.iloc[4]) else 0,
-                    'horasLaboradas': row.iloc[5] if not pd.isna(row.iloc[5]) else '',
-                    'horasExtraSimples': row.iloc[6] if not pd.isna(row.iloc[6]) else '',
-                    'horasExtrasDobles': row.iloc[7] if not pd.isna(row.iloc[7]) else '',
-                    'bonificacionNocturna': row.iloc[8] if not pd.isna(row.iloc[8]) else '',
-                    'diasLicenciaGoceHaber': row.iloc[9] if not pd.isna(row.iloc[9]) else '',
+                    'horasLaboradas': convert_decimal_to_hours_minutes(row.iloc[5]) if not pd.isna(row.iloc[5]) else '',
+                    'horasExtraSimples': convert_decimal_to_hours_minutes(row.iloc[6]) if not pd.isna(row.iloc[6]) else '',
+                    'horasExtrasDobles': convert_decimal_to_hours_minutes(row.iloc[7]) if not pd.isna(row.iloc[7]) else '',
+                    'bonificacionNocturna': row.iloc[8] if not pd.isna(row.iloc[8]) else 0,
+                    'diasLicenciaGoceHaber': row.iloc[9] if not pd.isna(row.iloc[9]) else 0,
                     'diasFalta': row.iloc[10] if not pd.isna(row.iloc[10]) else 0,
                     'diasVacaciones': row.iloc[11] if not pd.isna(row.iloc[11]) else 0,
                     'diasDescansoMedico': row.iloc[12] if not pd.isna(row.iloc[12]) else 0,
@@ -124,7 +128,7 @@ class RemunerationViewSet(viewsets.ModelViewSet):
                     'netoPagar': row.iloc[49] if not pd.isna(row.iloc[49]) else 0,
                 }
                 voucher = Voucher(worker=worker, remuneration=remuneration, **voucher_data)
-                voucher.save
+                voucher.save()
 
                 # obtenemos el token del voucher
                 voucher_token = voucher.token
@@ -133,26 +137,32 @@ class RemunerationViewSet(viewsets.ModelViewSet):
                 email_subject = f'BOLETA DE PAGO {str(remuneration.month).zfill(2)}-{str(remuneration.year)}'
                 email_body = render_to_string('email_template.html', {
                     'date_voucher': concatenar_mes_ano(int(remuneration.month), remuneration.year),
-                    'link_voucher': f'http://localhost:5173/voucherController/view?token={str(voucher_token)}'
+                    'link_voucher': f'{DOMAIN}/voucherController/view?token={str(voucher_token)}',
+                    'worker_fullname': f'{worker.user.first_name} {worker.user.last_name}',
                 })
                 email_plain_text = strip_tags(email_body)
-                email_result = send_email(email_subject, email_plain_text, email_body, 'sistemas@emaransac.com', worker.user.email)
-                
-                if email_result == 'Success':
-                    voucher.sentEmail = True
-                    voucher.sentEmailDate = timezone.localtime(timezone.now())
-                else:
-                    voucher.sentEmail = False
-                    voucher.errorSend = email_result
-                voucher.save()
+                # email_result = send_email(email_subject, email_plain_text, email_body, EMAIL_TRANSMITTER, worker.user.email)
+                send_email_task.apply_async(
+                    (voucher.id, email_subject, email_plain_text, email_body, EMAIL_TRANSMITTER, worker.user.email),
+                    countdown=delay
+                )
+                delay += 10
+                # if email_result == 'Success':
+                #     voucher.sentEmail = True
+                #     voucher.sentEmailDate = timezone.now()
+                # else:
+                #     voucher.sentEmail = False
+                #     voucher.errorSend = email_result
+                # voucher.save()
             
-            return Response({"message": "Data processed and saved successfully"}, status=status.HTTP_201_CREATED)
+            return Response({"detail": "Información procesada y guardada correctamente"}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
             transaction.set_rollback(True)
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class VoucherViewSet(viewsets.ViewSet):
+    # permission_classes = [permissions.IsAuthenticated]
     
     @action(detail=False, methods=['post'])
     def getVoucherByToken(self, request):
@@ -214,7 +224,8 @@ class VoucherViewSet(viewsets.ViewSet):
 
                 # Actualizar la instancia de Voucher
                 record.reviewed = True
-                record.reviewedDate = timezone.localtime(timezone.now())
+                print(timezone.now())
+                record.reviewDate = timezone.now()
                 record.save()
 
                 return Response({'detail': 'Verification completed successfully.'}, status=status.HTTP_200_OK)
@@ -225,17 +236,44 @@ class VoucherViewSet(viewsets.ViewSet):
             return Response({'detail': 'Parameters incorrects'}, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['post'])
-    def send_test_email(self, request):
-        subject = 'Test Email'
-        message = '<h1>This is a test email</h1>'
-        from_email = 'sistemas@emaransac.com'
-        to_email = 'pold.jacobo89@gmail.com'
-        result = send_email(subject, message, from_email, [to_email])
-        
-        if result == 'Success':
-            return Response({"message": result}, status=status.HTTP_200_OK)
+    def forwardEmailVoucher(self, request):
+        idVoucher = request.data.get('idVoucher', None)
+        # if not request.user.is_authenticated:
+        #     return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if idVoucher is not None:
+            try:
+                voucher = Voucher.objects.get(id=idVoucher)
+                voucher_token = voucher.token
+                remuneration_id = voucher.remuneration.id
+                remuneration = Remuneration.objects.get(id=remuneration_id)
+                worker_id = voucher.worker.id
+                worker = Worker.objects.get(id=worker_id)
+
+                # parametros de email
+                email_subject = f'BOLETA DE PAGO {str(remuneration.month).zfill(2)}-{str(remuneration.year)}'
+                email_body = render_to_string('email_template.html', {
+                    'date_voucher': concatenar_mes_ano(int(remuneration.month), remuneration.year),
+                    'link_voucher': f'http://localhost:5173/voucherController/view?token={str(voucher_token)}'
+                })
+                email_plain_text = strip_tags(email_body)
+                email_result = send_email(email_subject, email_plain_text, email_body, EMAIL_TRANSMITTER, worker.user.email)
+                
+                if email_result == 'Success':
+                    voucher.sentEmail = True
+                    voucher.sentEmailDate = timezone.now()
+                    voucher.save()
+                    return Response({'detail': 'Correo electrónico enviado.'}, status=status.HTTP_200_OK)
+                else:
+                    voucher.sentEmail = False
+                    voucher.errorSend = email_result
+                    voucher.save()
+                    return Response({'detail': email_result}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+            except Voucher.DoesNotExist:
+                return Response({'detail': 'Registro no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"error": result}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'detail': 'Parametros incorrectos'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Funcion de importación de trabajadores
 def cargar_datos_desde_excel(request):

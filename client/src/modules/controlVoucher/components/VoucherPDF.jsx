@@ -16,9 +16,8 @@ const textInformacionEnterprise = 'URB. PARQUE INDUSTRIAL RIO SECO MZ. E LT.8, C
 const textObservaciones = 'EN VIRTUD AL D. LEG N° 1310 DE FECHA 29.12.2016, QUE APRUEBA EL USO DE TECNOLOGIAS DE DIGITALIZACION DE DOCUMENTOS LABORALES, PARA SUSTITUIR DOCUMENTOS FISICOS Y FIRMAS OLOGRAFICAS, SE ENVIO LA PRESENTE DEL PLAZO, AL E-MAIL DECLARADO POR EL TRABAJADOR'
 
 export const VoucherPDF = ({ data }) => {
-  console.log(data)
   const { remuneration, worker } = data
-  const title = `BOLETA DE PAGO MENSUAL - ${getMonthName(remuneration.month)}-${remuneration.year} - ${data.worker.user.last_name} ${data.worker.user.first_name}`
+  const title = `BOLETA DE PAGO MENSUAL - ${getMonthName(remuneration.month)}-${remuneration.year} - ${worker?.user.last_name || 'N/A'} ${worker?.user.first_name || 'N/A'}`
   return (
     <Document
       title={title}
@@ -48,42 +47,42 @@ export const VoucherPDF = ({ data }) => {
               {/* TRABAJADOR */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>TRABAJADOR</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(`${worker.user.last_name} ${worker.user.first_name}`)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(`${worker?.user.last_name || 'N/A'} ${worker?.user.first_name || 'N/A'}`)}</Text>
               </View>
               {/* CARGO */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>CARGO</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.workerPosition.description)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.workerPosition.description || 'N/A')}</Text>
               </View>
               {/* DOC. IDENTIDAD */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>DOC. IDENTIDAD</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.document)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.document || 'N/A')}</Text>
               </View>
               {/* REG. LABORAL */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>REG. LABORAL</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.workRegime)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.workRegime || 'N/A')}</Text>
               </View>
               {/* TIPO DE TRAB. */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>TIPO DE TRAB.</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.typeWorker.description)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.typeWorker.description || 'N/A')}</Text>
               </View>
               {/* SIT. ESPECIAL */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>SIT. ESPECIAL</Text>
-                <Text style={styles.textValueProperty}>{styleValueBooleanValue(worker.specialSituation)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueBooleanValue(worker?.specialSituation || 'N/A')}</Text>
               </View>
               {/* REG. PENSIONARIO */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>REG. PENSIONARIO</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.pensionScheme)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.pensionScheme || 'N/A')}</Text>
               </View>
               {/* C.U.S.P.P. */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>C.U.S.P.P.</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.codeCUSPP)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.codeCUSPP || 'N/A')}</Text>
               </View>
             </View>
             {/* SEGUNDA SECCION */}
@@ -91,7 +90,7 @@ export const VoucherPDF = ({ data }) => {
               {/* SUELDO / SALARIO */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>SUELDO / SALARIO</Text>
-                <Text style={styles.textValueProperty}>{styleValueMoney(worker.salary)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueMoney(worker?.salary || 'N/A')}</Text>
               </View>
               {/* FECHA INGRESO */}
               <View style={styles.containerFlexRow}>
@@ -106,7 +105,7 @@ export const VoucherPDF = ({ data }) => {
               {/* CENTRO DE COSTO */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>CENTRO DE COSTO</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.costCenter)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.costCenter || 'N/A')}</Text>
               </View>
               {/* FECHA INICIO VAC. */}
               <View style={styles.containerFlexRow}>
@@ -121,17 +120,17 @@ export const VoucherPDF = ({ data }) => {
               {/* SEDE */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>SEDE</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.sede)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.sede || 'N/A')}</Text>
               </View>
               {/* SITUACIÓN */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>SITUACIÓN</Text>
-                <Text style={styles.textValueProperty}>{styleValueProperty(worker.situation)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.situation || 'N/A')}</Text>
               </View>
               {/* HIJOS */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>HIJOS</Text>
-                <Text style={styles.textValueProperty}>{styleValueBooleanValue(worker.hasChildren)}</Text>
+                <Text style={styles.textValueProperty}>{styleValueBooleanValue(worker?.hasChildren || 'N/A')}</Text>
               </View>
             </View>
             {/* TERCERA SECCION */}
@@ -451,7 +450,7 @@ export const VoucherPDF = ({ data }) => {
             >
               <Text style={styles.textValueObservation}>{`ENVIADO EL: ${parseDateVoucher(data.creationDate)}`}</Text>
               <Text style={styles.textValueObservation}>De: asistentecontable@emaransac.com</Text>
-              <Text style={styles.textValueObservation}>{`Para: ${data.worker.user.email}`}</Text>
+              <Text style={styles.textValueObservation}>{`Para: ${data.worker?.user.email || 'N/A'}`}</Text>
               <Text style={styles.textValueObservation}>
               RECIBIDO CONFORME LO ESTABLECE EL
               </Text>

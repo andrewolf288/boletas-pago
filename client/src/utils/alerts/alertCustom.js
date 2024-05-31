@@ -1,5 +1,20 @@
 import toast from 'react-hot-toast'
 
+export function alertInfo (message) {
+  toast(message, {
+    duration: 4000, // Duración de la notificación en milisegundos (opcional)
+    style: {
+      background: '#f5f2ed', // Color de fondo de la notificación
+      border: '2px solid #d4d0c9', // Borde de la notificación
+      color: '#2d3436' // Color del texto
+    },
+    iconTheme: {
+      primary: '#3d63d4', // Color del icono de advertencia
+      secondary: '#3d63d4' // Color de fondo del icono de advertencia
+    },
+    icon: 'ℹ'
+  })
+}
 export function alertWarning (message) {
   toast(message, {
     duration: 4000, // Duración de la notificación en milisegundos (opcional)
@@ -35,9 +50,9 @@ export function alertError (message) {
   )
 }
 
-export function alertSuccess () {
+export function alertSuccess (message = '¡Éxito! La operación se ha completado correctamente.') {
   toast.success(
-    '¡Éxito! La operación se ha completado correctamente.',
+    message,
     {
       duration: 4000, // Duración de la notificación en milisegundos (opcional)
       style: {

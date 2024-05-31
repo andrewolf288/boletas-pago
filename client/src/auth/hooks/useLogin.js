@@ -4,12 +4,14 @@ import { useAuthStore } from '../../stores'
 import { useNavigate } from 'react-router-dom'
 import { alertError } from '../../utils/alerts'
 import { useState } from 'react'
+import { useLoginAttempts } from './useLoginAttempts'
 
 export function useLogin () {
   const navigate = useNavigate()
   const { register, handleSubmit } = useForm()
   const [showPassword, setShowPassword] = useState(false)
   const setCredentialsLogin = useAuthStore(state => state.setCredentialsLogin)
+  const { attempts, incrementAttempts, cooldown, isDisabled, resetAttempts, permanentlyDisabled } = useLoginAttempts()
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev)
@@ -19,9 +21,11 @@ export function useLogin () {
     try {
       const { data } = await login(credentials)
       setCredentialsLogin(data)
+      resetAttempts()
       navigate('/home')
     } catch (error) {
       alertError(error.message)
+      incrementAttempts()
     }
   }
 
@@ -30,6 +34,12 @@ export function useLogin () {
     handleSubmit,
     loginUser,
     showPassword,
-    togglePasswordVisibility
+    togglePasswordVisibility,
+    attempts,
+    incrementAttempts,
+    cooldown,
+    isDisabled,
+    resetAttempts,
+    permanentlyDisabled
   }
 }

@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
-from django.utils import timezone
 from datetime import datetime
 
 User = get_user_model()
@@ -12,6 +11,10 @@ class RegistrationStatus(models.Model):
 
     def __str__(self):
         return self.description
+    
+    class Meta:
+        verbose_name = 'Estado de registro'
+        verbose_name_plural = 'Estados de registros'
 
 class TypeDocument(models.Model):
     description = models.CharField(max_length=100, blank=False, null=False)
@@ -19,6 +22,10 @@ class TypeDocument(models.Model):
 
     def __str__(self):
         return self.description
+    
+    class Meta:
+        verbose_name = 'Tipo documento'
+        verbose_name_plural = 'Tipo documentos'
 
 class TypeRemuneration(models.Model):
     description = models.CharField(max_length=100, blank=False, null=False)
@@ -26,6 +33,10 @@ class TypeRemuneration(models.Model):
 
     def __str__(self):
         return self.description
+    
+    class Meta:
+        verbose_name = 'Tipo remuneración'
+        verbose_name_plural = 'Tipo remuneraciones'
 
 class TypeWorker(models.Model):
     description = models.CharField(max_length=100, blank=False, null=False)
@@ -33,6 +44,10 @@ class TypeWorker(models.Model):
 
     def __str__(self):
         return self.description
+    
+    class Meta:
+        verbose_name = 'Tipo trabajador'
+        verbose_name_plural = 'Tipo trabajadores'
 
 class WorkerPosition(models.Model):
     description = models.CharField(max_length=100, blank=False, null=False)
@@ -40,6 +55,10 @@ class WorkerPosition(models.Model):
 
     def __str__(self):
         return self.description
+    
+    class Meta:
+        verbose_name = 'Puesto trabajador'
+        verbose_name_plural = 'Puesto trabajadores'
 
 class Worker(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -103,6 +122,10 @@ class Remuneration(models.Model):
     
     def __str__(self):
         return f'{self.code} - {str(self.month).zfill(2)} - {self.year}'
+    
+    class Meta:
+        verbose_name = 'Remuneración'
+        verbose_name_plural = 'Remuneraciones'
 
 class Voucher(models.Model):
     # informacion de verificacion
@@ -118,15 +141,15 @@ class Voucher(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
 
     # informacion planilla
-    fechaInicioVacaciones = models.DateField(null=True, blank=True)
-    fechaFinVacaciones = models.DateField(null=True, blank=True)
+    fechaInicioVacaciones = models.CharField(max_length=15, blank=True)
+    fechaFinVacaciones = models.CharField(max_length=15, blank=True)
     diasLaborados = models.PositiveSmallIntegerField(default=0)
     diasNoLaborados = models.PositiveSmallIntegerField(default=0)
     horasLaboradas = models.CharField(max_length=10, blank=True)
     horasExtraSimples = models.CharField(max_length=10, blank=True)
     horasExtrasDobles = models.CharField(max_length=10, blank=True)
-    bonificacionNocturna = models.CharField(max_length=10, blank=True)
-    diasLicenciaGoceHaber = models.CharField(max_length=10, blank=True)
+    bonificacionNocturna = models.PositiveSmallIntegerField(default=0)
+    diasLicenciaGoceHaber = models.PositiveSmallIntegerField(default=0)
     diasFalta = models.PositiveSmallIntegerField(default=0)
     diasVacaciones = models.PositiveSmallIntegerField(default=0)
     diasDescansoMedico = models.PositiveSmallIntegerField(default=0)
@@ -212,3 +235,7 @@ class PaymentReceiptVerification(models.Model):
             self.durationReview = int((self.datetimeEndSession - self.datetimeStartSession).total_seconds())
         
         super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Información verificación'
+        verbose_name_plural = 'Información verificación'
