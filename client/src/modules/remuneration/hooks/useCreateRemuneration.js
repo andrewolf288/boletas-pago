@@ -5,6 +5,8 @@ import { alertError, alertSuccess, alertWarning } from '../../../utils'
 import { createRemunerationWithImportation } from '../services'
 
 export function useCreateRemuneration (traerInformacionRemuneraciones) {
+  // implementacion de loading
+  const [loading, setLoading] = React.useState(false)
   // estados para controlar la apertura del dialogo
   const [open, setOpen] = React.useState(false)
   // funcion para abrir el cuadro de dialogo
@@ -24,6 +26,7 @@ export function useCreateRemuneration (traerInformacionRemuneraciones) {
     if (acceptedFiles.length === 0) {
       alertWarning('Debes ingresar la data a importar')
     } else {
+      setLoading(true)
       const formatFormData = {
         ...formData,
         remunerationDateStart: formData.remunerationDateStart.format('YYYY-MM-DD'),
@@ -46,6 +49,8 @@ export function useCreateRemuneration (traerInformacionRemuneraciones) {
       } catch (error) {
         console.log(error)
         alertError(error.response.data.detail)
+      } finally {
+        setLoading(false)
       }
     }
   }
@@ -59,6 +64,7 @@ export function useCreateRemuneration (traerInformacionRemuneraciones) {
 
   return {
     open,
+    loading,
     handleClickOpen,
     handleClose,
     register,

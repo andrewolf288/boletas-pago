@@ -29,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -192,5 +191,11 @@ EMAIL_HOST_USER = 'sistemas@emaransac.com'
 EMAIL_HOST_PASSWORD = 'a93W*d4l0'
 DEFAULT_FROM_EMAIL = 'sistemas@emaransac.com'
 
-# Celery settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# # Celery settings
+# CELERY_BROKER_URL = 'amqp://localhost'
+# CELERY_RESULT_BACKEND = 'rpc://'
+# # CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'America/Lima'

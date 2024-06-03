@@ -10,12 +10,14 @@ from django_user_agents.utils import get_user_agent
 # from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.core.mail import get_connection
-from .utils import concatenar_mes_ano, convert_decimal_to_hours_minutes, excel_serial_to_date, send_email_task
+from .utils import concatenar_mes_ano, convert_decimal_to_hours_minutes, excel_serial_to_date, send_email
 import pandas as pd
 from django.db import transaction
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils import timezone
+import time
+import random
 
 import os
 
@@ -141,19 +143,24 @@ class RemunerationViewSet(viewsets.ModelViewSet):
                     'worker_fullname': f'{worker.user.first_name} {worker.user.last_name}',
                 })
                 email_plain_text = strip_tags(email_body)
-                # email_result = send_email(email_subject, email_plain_text, email_body, EMAIL_TRANSMITTER, worker.user.email)
-                send_email_task.apply_async(
-                    (voucher.id, email_subject, email_plain_text, email_body, EMAIL_TRANSMITTER, worker.user.email),
-                    countdown=delay
-                )
-                delay += 10
-                # if email_result == 'Success':
-                #     voucher.sentEmail = True
-                #     voucher.sentEmailDate = timezone.now()
-                # else:
-                #     voucher.sentEmail = False
-                #     voucher.errorSend = email_result
-                # voucher.save()
+                
+                # enviamos email cada 5 a 10 segundos
+                time.sleep(random.randint(5, 10))
+                
+                email_result = send_email(email_subject, email_plain_text, email_body, EMAIL_TRANSMITTER, worker.user.email)
+                if email_result == 'Success':
+                    voucher.sentEmail = True
+                    voucher.sentEmailDate = timezone.now()
+                else:
+                    voucher.sentEmail = False
+                    voucher.errorSend = email_result
+                voucher.save()
+
+                # send_email_task.apply_async(
+                #     (voucher.id, email_subject, email_plain_text, email_body, EMAIL_TRANSMITTER, worker.user.email),
+                #     countdown=delay
+                # )
+                # delay += 10
             
             return Response({"detail": "Información procesada y guardada correctamente"}, status=status.HTTP_201_CREATED)
 

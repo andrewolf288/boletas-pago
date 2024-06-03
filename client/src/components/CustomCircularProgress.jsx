@@ -1,7 +1,7 @@
 import { CircularProgress, Typography } from '@mui/material'
 import React from 'react'
 
-export const CustomCircularProgress = () => {
+export const CustomCircularProgress = ({ textLoading = 'Procesando...' }) => {
   return (
     <div
       style={{
@@ -20,7 +20,7 @@ export const CustomCircularProgress = () => {
       <div style={{ textAlign: 'center' }}>
         <CircularProgress />
         <Typography variant="subtitle1" color="textSecondary" component="p">
-          Procesando...
+          {textLoading}
         </Typography>
       </div>
     </div>
