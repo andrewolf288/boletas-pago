@@ -2,12 +2,14 @@ import React from 'react'
 import { useCreateRemuneration } from '../hooks'
 import { AppBar, Button, Dialog, IconButton, TextField, Toolbar, Typography } from '@mui/material'
 import { IoMdClose, IoMdAddCircle } from 'react-icons/io'
-import { CustomDatePicker } from '../../../components'
+import { CustomCircularProgress, CustomDatePicker } from '../../../components'
 import { Controller } from 'react-hook-form'
 
+const textLoading = 'La solicitud se esta procesado. Esto puede tarde entre 7 a 8 minutos.'
 export const CreateRemuneration = ({ traerInformacionRemuneraciones }) => {
   const {
     open,
+    loading,
     handleClickOpen,
     handleClose,
     register,
@@ -19,6 +21,10 @@ export const CreateRemuneration = ({ traerInformacionRemuneraciones }) => {
     getInputProps,
     getRootProps
   } = useCreateRemuneration(traerInformacionRemuneraciones)
+
+  if (loading) {
+    return <CustomCircularProgress textLoading={textLoading}/>
+  }
 
   return (
     <React.Fragment>

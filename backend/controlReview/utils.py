@@ -1,9 +1,9 @@
-from celery import shared_task
+# from celery import shared_task
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 # import smtplib
 from datetime import datetime, timedelta
-from .models import Voucher
+# from .models import Voucher
 
 def send_email(subject, text_content, html_content, from_email, to_email):
     try:
@@ -24,25 +24,25 @@ def send_email(subject, text_content, html_content, from_email, to_email):
     except Exception as e:
         return f'Sorry, something went wrong. Please try again later: {e}'
 
-@shared_task
-def send_email_task(voucher_id, subject, text_content, html_content, from_email, to_email):
-    print(f'Enviando correo {voucher_id} {subject} {text_content} {html_content} {from_email} {to_email}')
-    try:
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+# @shared_task
+# def send_email_task(voucher_id, subject, text_content, html_content, from_email, to_email):
+#     print(f'Enviando correo {voucher_id} {subject} {text_content} {html_content} {from_email} {to_email}')
+#     try:
+#         msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+#         msg.attach_alternative(html_content, "text/html")
+#         msg.send()
         
-        voucher = Voucher.objects.get(id=voucher_id)
-        voucher.sentEmail = True
-        voucher.sentEmailDate = timezone.now()
-        voucher.save()
-        print('Se envio con exito')
-    except Exception as e:
-        voucher = Voucher.objects.get(id=voucher_id)
-        voucher.sentEmail = False
-        voucher.errorSend = str(e)
-        voucher.save()
-        print('Se envio sin exito')
+#         voucher = Voucher.objects.get(id=voucher_id)
+#         voucher.sentEmail = True
+#         voucher.sentEmailDate = timezone.now()
+#         voucher.save()
+#         print('Se envio con exito')
+#     except Exception as e:
+#         voucher = Voucher.objects.get(id=voucher_id)
+#         voucher.sentEmail = False
+#         voucher.errorSend = str(e)
+#         voucher.save()
+#         print('Se envio sin exito')
 
 def obtener_nombre_mes(numero_mes):
     # Lista de nombres de meses

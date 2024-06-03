@@ -10,7 +10,7 @@ from django_user_agents.utils import get_user_agent
 # from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.core.mail import get_connection
-from .utils import concatenar_mes_ano, convert_decimal_to_hours_minutes, excel_serial_to_date, send_email_task, send_email
+from .utils import concatenar_mes_ano, convert_decimal_to_hours_minutes, excel_serial_to_date, send_email
 import pandas as pd
 from django.db import transaction
 from django.template.loader import render_to_string
