@@ -6,6 +6,7 @@ from django.conf import settings
 # Configuración por defecto del módulo de Django para 'celery'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'planilla.settings')
 
+# app = Celery('planilla', broker='redis://localhost:6379/0', backend='redis://')
 app = Celery('planilla')
 
 # Usar una cadena aquí significa que el worker no tiene que serializar
