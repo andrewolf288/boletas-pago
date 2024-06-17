@@ -104,7 +104,7 @@ const ViewVoucherPdfViewer = ({ voucher, onChangeFlagDownloadPDF, registerInform
           >
             <FaCheck />
             <span>
-            Verificar
+            Recibido
             </span>
           </button>
         </div>
@@ -208,7 +208,7 @@ const ViewDisabledPageMobileAgent = ({ voucher, onChangeFlagDownloadPDF, registe
           >
             <FaCheck />
             <span>
-            Verificar
+            Recibido
             </span>
           </button>
         </div>

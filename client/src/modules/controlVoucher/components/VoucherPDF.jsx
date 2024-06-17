@@ -9,7 +9,7 @@ const styles = VoucherStyles
 FontRegister()
 
 const styleValueProperty = (text, emptyText = '-') => `:    ${text.length !== 0 ? text : emptyText}`
-const styleValueBooleanValue = (value) => `:    ${value ? 'SI' : 'NO'}`
+const styleValueBooleanValue = (value) => `:    ${value === true ? 'SI' : 'NO'}`
 const styleValueMoney = (value) => `:    S/ ${value}`
 const styleDateValue = (date) => `:    ${date ? formatDate(date) : '-'}`
 const textInformacionEnterprise = 'URB. PARQUE INDUSTRIAL RIO SECO MZ. E LT.8, CERRO COLORADO - RUC N° 20120914279 - D.S. 001-98-TR (22.01.98)'
@@ -72,7 +72,7 @@ export const VoucherPDF = ({ data }) => {
               {/* SIT. ESPECIAL */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>SIT. ESPECIAL</Text>
-                <Text style={styles.textValueProperty}>{styleValueBooleanValue(worker?.specialSituation || 'N/A')}</Text>
+                <Text style={styles.textValueProperty}>{styleValueProperty(worker?.specialSituation)}</Text>
               </View>
               {/* REG. PENSIONARIO */}
               <View style={styles.containerFlexRow}>
@@ -130,7 +130,7 @@ export const VoucherPDF = ({ data }) => {
               {/* HIJOS */}
               <View style={styles.containerFlexRow}>
                 <Text style={styles.textTitleProperty}>HIJOS</Text>
-                <Text style={styles.textValueProperty}>{styleValueBooleanValue(worker?.hasChildren || 'N/A')}</Text>
+                <Text style={styles.textValueProperty}>{styleValueBooleanValue(worker?.hasChildren)}</Text>
               </View>
             </View>
             {/* TERCERA SECCION */}
